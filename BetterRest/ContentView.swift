@@ -26,29 +26,38 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             Form {
-                VStack(alignment: .leading, spacing: 0) {
+                Section {
                     Text("When do you want to wake up?")
                         .font(.headline)
                     
-                    DatePicker("Please enter a time", selection: $wakeUp, displayedComponents: .hourAndMinute)
+                    DatePicker("Please enter a time", selection: Binding(get: {
+                               self.wakeUp
+                           }, set: { newValue in
+                               self.wakeUp = newValue
+                               calculateBedtime()
+                           }), displayedComponents: .hourAndMinute)
                         .labelsHidden()
                         .datePickerStyle(WheelDatePickerStyle())
                 }
                 
-                VStack(alignment: .leading, spacing: 0) {
+                Section {
                     Text("Desired amount of sleep")
                         .font(.headline)
-                    
-                    Stepper(value: $sleepAmount, in: 4...12, step: 0.25) {
+                                        
+                    Stepper(value: $sleepAmount, in: 4...12, step: 0.25, onEditingChanged: { didChange in
+                        calculateBedtime()
+                    }) {
                         Text("\(sleepAmount, specifier: "%g") hours")
                     }
                 }
                 
-                VStack(alignment: .leading, spacing: 0) {
+                Section {
                     Text("Daily coffee intake")
                         .font(.headline)
                     
-                    Stepper(value: $coffeeAmount, in: 1...20) {
+                    Stepper(value: $coffeeAmount, in: 1...20, onEditingChanged: { didChange in
+                        calculateBedtime()
+                    }) {
                         if coffeeAmount == 1 {
                             Text("1 cup")
                         } else {
@@ -56,16 +65,18 @@ struct ContentView: View {
                         }
                     }
                 }
+                                
+                Section {
+                    Text("\(alertTitle)")
+                        .font(.headline)
+                    Text("\(alertMessage)")
+                }
+                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .center)
             }
             .navigationBarTitle("BetterRest")
-            .navigationBarItems(trailing:
-                Button(action: calculateBedtime) {
-                    Text("Calculate")
-                }
-            )
-            .alert(isPresented: $showingAlert, content: {
-                Alert(title: Text(alertTitle), message: Text(alertMessage), dismissButton: .default(Text("OK")))
-            })
+            .onAppear{
+                calculateBedtime()
+            }
         }
     }
     
