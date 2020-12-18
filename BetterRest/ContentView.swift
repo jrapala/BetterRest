@@ -49,6 +49,7 @@ struct ContentView: View {
                     }) {
                         Text("\(sleepAmount, specifier: "%g") hours")
                     }
+                    .accessibility(value: Text("\(sleepAmount, specifier: "%g") hours"))
                 }
                 
                 Section {
@@ -64,6 +65,7 @@ struct ContentView: View {
                             Text("\(coffeeAmount) cups")
                         }
                     }
+                    .accessibility(value: Text("\(coffeeAmount) \(coffeeAmount == 1 ? "cup" : "cups")"))
                 }
                                 
                 Section {
